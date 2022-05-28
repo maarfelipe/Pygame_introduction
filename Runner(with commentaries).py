@@ -22,7 +22,9 @@ sky_surface = pygame.image.load('graphics/sky.png').convert()
 ground_surface = pygame.image.load('graphics/ground.png').convert()
 '''cria um objeto que acessa o estilo previamente criado e recebe 3 parâmetros:
 o texto que será exibido, boolean para filtro anti-aliasing e cor do texto'''
-text_surface = test_font.render('My Game', False, 'Black')
+score_surf = test_font.render('My Game', False, (64, 64, 64))
+# cria um retângulo para o objeto score posicionado no meio da tela (400 metade de 800 acessado pelo centro do rect)
+score_rect = score_surf.get_rect(center=(400, 50))
 
 # para objetos que vão se mover ou receber algum tipo de animação, é recomendado a utilização de .convert_aplha()
 snail_surf = pygame.image.load('graphics/snail/snail1.png').convert_alpha()
@@ -72,7 +74,14 @@ while True:
     '''os valores entre parênteses definem a posição da imagem na tela criada,
     a ordem de chamada do screen.blit influencia na posição das imagens (o que fica na frente do que)'''
     screen.blit(ground_surface, (0, 300))
-    screen.blit(text_surface, (300, 50))
+    '''o método .draw neste caso foi usado para desenhar um rect que recebe três parâmetros:
+        ele ficará sobre na tela
+        sua cor de fundo 
+        e por último, será posicionado junto com score_rect
+    é possível ainda modificar a margem ou o border-radius do rect desenhado colocando mais parâmetros'''
+    pygame.draw.rect(screen, '#c0e8ec', score_rect)
+    pygame.draw.rect(screen, '#c0e8ec', score_rect, 10)
+    screen.blit(score_surf, score_rect)
 
     # posiciona na tela o objeto snail_surf posição snail_rect (que foi o retângulo previamente criado)
     screen.blit(snail_surf, snail_rect)
