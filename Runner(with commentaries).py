@@ -45,6 +45,8 @@ player_surf = pygame.image.load('graphics/Player/player_walk_1.png').convert_alp
             left    centerx OU centery  right
                             bottom"""
 player_rect = player_surf.get_rect(midbottom=(80, 300))
+# definindo um objeto gravidade, que deverá funcionar para manter o player no chão
+player_gravity = 0
 
 # o loop é criado para que a tela e os eventos permaneçam acontecendo, senão, tudo iria ser executado somente uma vez
 while True:
@@ -63,9 +65,18 @@ while True:
             print('mouse down')'''
         '''if event.type == pygame.MOUSEBUTTONUP: # .MOUSEBUTTONUP é o evento quando o botão do mouse é solto
             print('mouse up')'''
-        '''if event.type == pygame.MOUSEMOTION:
+
+        # criamos um if que reconhece o evento .MOUSEBUTTONDOWN
+        if event.type == pygame.MOUSEBUTTONDOWN:
             if player_rect.collidepoint(event.pos):
-                print('collision')'''
+                player_gravity = -20
+
+        # criamos um if que reconhece um tipo de evento, chamado .KEYDOWN
+        if event.type == pygame.KEYDOWN:
+            '''depois outro if que dentro do evento .KEYDOWN reconhece a tecla de espaço, que será utilizada para 
+            efetuar os pulos do jogador'''
+            player_gravity = -20
+
 
     '''# aqui estamos acessando a variável da superfície vermelha e escolhendo qual a sua posição
     screen.blit(test_surface, (0, 0))'''
@@ -91,7 +102,16 @@ while True:
     if snail_rect.right < 0:
         # a posição esquerda do retângulo no eixo X é definida para 800
         snail_rect.left = 800
+
+    '''no início o player tem gravidade 0, após cada interação do loop, a gravidade vai aumentando, e somando da posição
+    do eixo Y, movimentando o player para cima e fazendo com que ele caia exponecialmente'''
+    player_gravity += 1
+    player_rect.y += player_gravity
     screen.blit(player_surf, player_rect)
+
+    '''keys = pygame.key.get_pressed()
+    if keys[pygame.K_SPACE]:
+        print('jump')'''
 
     '''método .colliderect() testa se há colisões entre retângulos: 0 - false // 1 - true
     if player_rect.colliderect(snail_rect):'''
