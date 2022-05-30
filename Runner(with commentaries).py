@@ -1,6 +1,18 @@
 import pygame
 from sys import exit
 
+# criando uma função para apresentar o score
+def display_score():
+    # método .get_ticks() retorna o valor em milissegundos de execução do programa
+    current_time = int(pygame.time.get_ticks() / 100) - start_time
+    # criando um objeto para receber a variável de tempo, com as configurações de renderização de texto
+    score_surf = test_font.render(f'{current_time}', False, (64, 64, 64))
+    # criando um rectângulo com o método .get_rect e posicionando 400x50y
+    score_rect = score_surf.get_rect(center=(400, 50))
+    # posicionando na tela o objeto gerado (score_surf) na posição definida (score_rect)
+    screen.blit(score_surf, score_rect)
+
+
 # comando para iniciar o pygame e todas as suas funções
 pygame.init()
 # define o display surface, a tela que será apresentada ao usuário (width, height)
@@ -11,7 +23,10 @@ pygame.display.set_caption('Runner')
 clock = pygame.time.Clock()
 # define um estilo de font que pode ser importado, o seu tamanho também é definido agora
 test_font = pygame.font.Font('font/Pixeltype.ttf', 50)
+# criando uma varíavel booleana para poder resetar o game quando o player perder
 game_active = True
+# definindo uma variável para o tempo de jogo
+start_time = 0
 
 '''# dentro de uma variável, é possível guardar o tamanho de uma superfície e posteriormente "enchê-la" com uma cor
 test_surface = pygame.Surface((100, 200))
@@ -21,11 +36,12 @@ test_surface.fill('Red')'''
 é necessário utilizar o .convert() para facilitar o "entendimento" do pygame ao que está sendo importado'''
 sky_surface = pygame.image.load('graphics/sky.png').convert()
 ground_surface = pygame.image.load('graphics/ground.png').convert()
-'''cria um objeto que acessa o estilo previamente criado e recebe 3 parâmetros:
+
+"""'''cria um objeto que acessa o estilo previamente criado e recebe 3 parâmetros:
 o texto que será exibido, boolean para filtro anti-aliasing e cor do texto'''
 score_surf = test_font.render('My Game', False, (64, 64, 64))
 # cria um retângulo para o objeto score posicionado no meio da tela (400 metade de 800 acessado pelo centro do rect)
-score_rect = score_surf.get_rect(center=(400, 50))
+score_rect = score_surf.get_rect(center=(400, 50))"""
 
 # para objetos que vão se mover ou receber algum tipo de animação, é recomendado a utilização de .convert_aplha()
 snail_surf = pygame.image.load('graphics/snail/snail1.png').convert_alpha()
@@ -93,6 +109,7 @@ while True:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 game_active = True
                 snail_rect.left = 800
+                start_time = int(pygame.time.get_ticks() / 100)
 
     if game_active:
         '''# aqui estamos acessando a variável da superfície vermelha e escolhendo qual a sua posição
@@ -107,9 +124,11 @@ while True:
             sua cor de fundo 
             e por último, será posicionado junto com score_rect
         é possível ainda modificar a margem ou o border-radius do rect desenhado colocando mais parâmetros'''
-        pygame.draw.rect(screen, '#c0e8ec', score_rect)
+        '''pygame.draw.rect(screen, '#c0e8ec', score_rect)
         pygame.draw.rect(screen, '#c0e8ec', score_rect, 10)
-        screen.blit(score_surf, score_rect)
+        screen.blit(score_surf, score_rect)'''
+        # chamando a função para apresentar o score
+        display_score()
 
         # posiciona na tela o objeto snail_surf posição snail_rect (que foi o retângulo previamente criado)
         screen.blit(snail_surf, snail_rect)
