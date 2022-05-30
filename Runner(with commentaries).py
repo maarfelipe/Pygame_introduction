@@ -1,6 +1,7 @@
 import pygame
 from sys import exit
 
+
 # criando uma função para apresentar o score
 def display_score():
     # método .get_ticks() retorna o valor em milissegundos de execução do programa
@@ -11,6 +12,7 @@ def display_score():
     score_rect = score_surf.get_rect(center=(400, 50))
     # posicionando na tela o objeto gerado (score_surf) na posição definida (score_rect)
     screen.blit(score_surf, score_rect)
+    return current_time
 
 
 # comando para iniciar o pygame e todas as suas funções
@@ -24,9 +26,9 @@ clock = pygame.time.Clock()
 # define um estilo de font que pode ser importado, o seu tamanho também é definido agora
 test_font = pygame.font.Font('font/Pixeltype.ttf', 50)
 # criando uma varíavel booleana para poder resetar o game quando o player perder
-game_active = True
+game_active = False
 # definindo uma variável para o tempo de jogo
-start_time = 0
+start_time = score = 0
 
 '''# dentro de uma variável, é possível guardar o tamanho de uma superfície e posteriormente "enchê-la" com uma cor
 test_surface = pygame.Surface((100, 200))
@@ -64,6 +66,37 @@ player_surf = pygame.image.load('graphics/Player/player_walk_1.png').convert_alp
 player_rect = player_surf.get_rect(midbottom=(80, 300))
 # definindo um objeto gravidade, que deverá funcionar para manter o player no chão
 player_gravity = 0
+
+'''# criando um objeto que ficará na tela de início/reset
+player_stand = pygame.image.load('graphics/Player/player_stand.png').convert_alpha()
+# utilizando o método .transform.scale no objeto criado para alterar o seu tamanho
+player_stand = pygame.transform.scale(player_stand, (200, 400))
+# criando o retângulo do objeto através do método .get_rect
+player_stand_rect = player_stand.get_rect(center=(400, 200))'''
+
+'''# criando um objeto a partir do método .load e alterando seu tamanho com o método .transform.scale
+player_stand = pygame.transform.scale(pygame.image.load('graphics/Player/player_stand.png').convert_alpha(), (200, 300))
+player_stand_rect = player_stand.get_rect(center=(400, 200))'''
+
+'''# criando um objeto que ficará na tela de início/reset
+player_stand = pygame.image.load('graphics/Player/player_stand.png').convert_alpha()
+# utilizando o método .transform.scale2x no objeto criado para alterar o seu tamanho
+player_stand = pygame.transform.scale2x(player_stand)
+# criando o retângulo do objeto através do método .get_rect
+player_stand_rect = player_stand.get_rect(center=(400, 200))'''
+
+# criando um objeto que ficará na tela de início/reset
+player_stand = pygame.image.load('graphics/Player/player_stand.png').convert_alpha()
+# utilizando o método .transform.rotozoom no objeto criado para alterar o seu tamanho
+player_stand = pygame.transform.rotozoom(player_stand, 0, 2)  # o segundo valor altera o ângulo do objeto
+# criando o retângulo do objeto através do método .get_rect
+player_stand_rect = player_stand.get_rect(center=(400, 200))
+
+game_name = test_font.render('Pixel Runner', False, (111, 196, 169))
+game_name_rect = game_name.get_rect(center=(400, 80))
+
+game_message = test_font.render('Pressione espaco para correr', False, (111, 196, 169))
+game_message_rect = game_message.get_rect(center=(400, 330))
 
 # o loop é criado para que a tela e os eventos permaneçam acontecendo, senão, tudo iria ser executado somente uma vez
 while True:
@@ -128,7 +161,7 @@ while True:
         pygame.draw.rect(screen, '#c0e8ec', score_rect, 10)
         screen.blit(score_surf, score_rect)'''
         # chamando a função para apresentar o score
-        display_score()
+        score = display_score()
 
         # posiciona na tela o objeto snail_surf posição snail_rect (que foi o retângulo previamente criado)
         screen.blit(snail_surf, snail_rect)
@@ -153,7 +186,16 @@ while True:
         if snail_rect.colliderect(player_rect):
             game_active = False
     else:
-        screen.fill('Yellow')
+        screen.fill((94, 129, 162))
+        screen.blit(player_stand, player_stand_rect)
+
+        score_message = test_font.render(f'Score: {score}', False, (111, 196, 169))
+        score_message_rect = score_message.get_rect(center=(400, 330))
+        screen.blit(game_name, game_name_rect)
+        if score == 0:
+            screen.blit(game_message, game_message_rect)
+        else:
+            screen.blit(score_message, score_message_rect)
 
     '''keys = pygame.key.get_pressed()
     if keys[pygame.K_SPACE]:
