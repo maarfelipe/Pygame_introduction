@@ -11,6 +11,7 @@ pygame.display.set_caption('Runner')
 clock = pygame.time.Clock()
 # define um estilo de font que pode ser importado, o seu tamanho também é definido agora
 test_font = pygame.font.Font('font/Pixeltype.ttf', 50)
+game_active = True
 
 '''# dentro de uma variável, é possível guardar o tamanho de uma superfície e posteriormente "enchê-la" com uma cor
 test_surface = pygame.Surface((100, 200))
@@ -66,63 +67,74 @@ while True:
         '''if event.type == pygame.MOUSEBUTTONUP: # .MOUSEBUTTONUP é o evento quando o botão do mouse é solto
             print('mouse up')'''
 
-        """# criamos um if que reconhece o evento .MOUSEBUTTONDOWN
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            '''depois outro if que dentro do evento .MOUSEBUTTONDOWN reconhece a colisão entre a posição do mouse e o
-            retângulo do player, AND, verifica se o player está na posição 300, ou seja, no floor, permitindo assim
-            somente um pulo'''
-            if player_rect.collidepoint(event.pos) and player_rect.bottom >= 300:
-                player_gravity = -20
-                
-        # criamos um if que reconhece um tipo de evento, chamado .KEYDOWN
-        if event.type == pygame.KEYDOWN:
-            '''depois outro if que dentro do evento .KEYDOWN reconhece a tecla de espaço, que será utilizada para 
-            efetuar os pulos do jogador, AND, verifica se o player está na posição 300, ou seja, no floor, 
-            permitindo assim somente um pulo'''
-            if event.key == pygame.K_SPACE and player_rect.bottom >= 300:
-                player_gravity = -20"""
+        if game_active:
+            """# criamos um if que reconhece o evento .MOUSEBUTTONDOWN
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                '''depois outro if que dentro do evento .MOUSEBUTTONDOWN reconhece a colisão entre a posição do mouse e o
+                retângulo do player, AND, verifica se o player está na posição 300, ou seja, no floor, permitindo assim
+                somente um pulo'''
+                if player_rect.collidepoint(event.pos) and player_rect.bottom >= 300:
+                    player_gravity = -20
+                    
+            # criamos um if que reconhece um tipo de evento, chamado .KEYDOWN
+            if event.type == pygame.KEYDOWN:
+                '''depois outro if que dentro do evento .KEYDOWN reconhece a tecla de espaço, que será utilizada para 
+                efetuar os pulos do jogador, AND, verifica se o player está na posição 300, ou seja, no floor, 
+                permitindo assim somente um pulo'''
+                if event.key == pygame.K_SPACE and player_rect.bottom >= 300:
+                    player_gravity = -20"""
 
-        # juntando os dois últimos ifs para otimização de código
+            # juntando os dois últimos ifs para otimização de código
+            if player_rect.bottom >= 300:
+                if event.type == pygame.MOUSEBUTTONDOWN and player_rect.collidepoint(event.pos) \
+                        or event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    player_gravity = -20
+        else:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                game_active = True
+                snail_rect.left = 800
+
+    if game_active:
+        '''# aqui estamos acessando a variável da superfície vermelha e escolhendo qual a sua posição
+        screen.blit(test_surface, (0, 0))'''
+        # acessando o objeto sky_surface que foi previamente carregado fora do loop
+        screen.blit(sky_surface, (0, 0))
+        '''os valores entre parênteses definem a posição da imagem na tela criada,
+        a ordem de chamada do screen.blit influencia na posição das imagens (o que fica na frente do que)'''
+        screen.blit(ground_surface, (0, 300))
+        '''o método .draw neste caso foi usado para desenhar um rect que recebe três parâmetros:
+            ele ficará sobre na tela
+            sua cor de fundo 
+            e por último, será posicionado junto com score_rect
+        é possível ainda modificar a margem ou o border-radius do rect desenhado colocando mais parâmetros'''
+        pygame.draw.rect(screen, '#c0e8ec', score_rect)
+        pygame.draw.rect(screen, '#c0e8ec', score_rect, 10)
+        screen.blit(score_surf, score_rect)
+
+        # posiciona na tela o objeto snail_surf posição snail_rect (que foi o retângulo previamente criado)
+        screen.blit(snail_surf, snail_rect)
+        # acessando o eixo X do retângulo para definir sua motimentação na tela
+        snail_rect.x -= 4
+        # se a posição da direita do retângulo for menor que 0 no eixo X
+        if snail_rect.right < 0:
+            # a posição esquerda do retângulo no eixo X é definida para 800
+            snail_rect.left = 800
+
+        '''como na vida real, a gravidade nos puxa para baixo, portanto a mecânica utilizada segue este padrão, em todas
+        as interações do loop a gravidade tenta puxar o player para baixo, quando ESPAÇO ou MOUSE são pressionados, ela
+        recebe um valor negativo (-20), fazendo o player pular'''
+        player_gravity += 1
+        player_rect.y += player_gravity
+        '''o player não cai infinitamente pois criamos um floor utilizando a posição 300 na tela, que é a mesma posição do
+        ground_surface'''
         if player_rect.bottom >= 300:
-            if event.type == pygame.MOUSEBUTTONDOWN and player_rect.collidepoint(event.pos) \
-                    or event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                player_gravity = -20
+            player_rect.bottom = 300
+        screen.blit(player_surf, player_rect)
 
-    '''# aqui estamos acessando a variável da superfície vermelha e escolhendo qual a sua posição
-    screen.blit(test_surface, (0, 0))'''
-    # acessando o objeto sky_surface que foi previamente carregado fora do loop
-    screen.blit(sky_surface, (0, 0))
-    '''os valores entre parênteses definem a posição da imagem na tela criada,
-    a ordem de chamada do screen.blit influencia na posição das imagens (o que fica na frente do que)'''
-    screen.blit(ground_surface, (0, 300))
-    '''o método .draw neste caso foi usado para desenhar um rect que recebe três parâmetros:
-        ele ficará sobre na tela
-        sua cor de fundo 
-        e por último, será posicionado junto com score_rect
-    é possível ainda modificar a margem ou o border-radius do rect desenhado colocando mais parâmetros'''
-    pygame.draw.rect(screen, '#c0e8ec', score_rect)
-    pygame.draw.rect(screen, '#c0e8ec', score_rect, 10)
-    screen.blit(score_surf, score_rect)
-
-    # posiciona na tela o objeto snail_surf posição snail_rect (que foi o retângulo previamente criado)
-    screen.blit(snail_surf, snail_rect)
-    # acessando o eixo X do retângulo para definir sua motimentação na tela
-    snail_rect.x -= 4
-    # se a posição da direita do retângulo for menor que 0 no eixo X
-    if snail_rect.right < 0:
-        # a posição esquerda do retângulo no eixo X é definida para 800
-        snail_rect.left = 800
-
-    '''como na vida real, a gravidade nos puxa para baixo, portanto a mecânica utilizada segue este padrão, em todas
-    as interações do loop a gravidade tenta puxar o player para baixo, quando ESPAÇO ou MOUSE são pressionados, ela
-    recebe um valor negativo (-20), fazendo o player pular'''
-    player_gravity += 1
-    player_rect.y += player_gravity
-    '''o player não cai infinitamente pois criamos um floor utilizando a posição 300 na tela, que é a mesma posição do
-    ground_surface'''
-    if player_rect.bottom >= 300:
-        player_rect.bottom = 300
-    screen.blit(player_surf, player_rect)
+        if snail_rect.colliderect(player_rect):
+            game_active = False
+    else:
+        screen.fill('Yellow')
 
     '''keys = pygame.key.get_pressed()
     if keys[pygame.K_SPACE]:
