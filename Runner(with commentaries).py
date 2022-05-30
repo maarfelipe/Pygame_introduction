@@ -33,7 +33,7 @@ os valores entre parênteses definem qual é a posição na tela daquele ponto d
 snail_rect = snail_surf.get_rect(bottomright=(600, 300))
 
 player_surf = pygame.image.load('graphics/Player/player_walk_1.png').convert_alpha()
-"""para parametrizar os retângulos, podemos acessar os valores de tudas formas:
+"""para parametrizar os retângulos, podemos acessar os valores das seguintes formas:
     tuplas(x, y):
         podemos acessar cada valor separado em nove possíveis posições:
             topleft         midtop          topright
@@ -66,17 +66,27 @@ while True:
         '''if event.type == pygame.MOUSEBUTTONUP: # .MOUSEBUTTONUP é o evento quando o botão do mouse é solto
             print('mouse up')'''
 
-        # criamos um if que reconhece o evento .MOUSEBUTTONDOWN
+        """# criamos um if que reconhece o evento .MOUSEBUTTONDOWN
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if player_rect.collidepoint(event.pos):
+            '''depois outro if que dentro do evento .MOUSEBUTTONDOWN reconhece a colisão entre a posição do mouse e o
+            retângulo do player, AND, verifica se o player está na posição 300, ou seja, no floor, permitindo assim
+            somente um pulo'''
+            if player_rect.collidepoint(event.pos) and player_rect.bottom >= 300:
                 player_gravity = -20
-
+                
         # criamos um if que reconhece um tipo de evento, chamado .KEYDOWN
         if event.type == pygame.KEYDOWN:
             '''depois outro if que dentro do evento .KEYDOWN reconhece a tecla de espaço, que será utilizada para 
-            efetuar os pulos do jogador'''
-            player_gravity = -20
+            efetuar os pulos do jogador, AND, verifica se o player está na posição 300, ou seja, no floor, 
+            permitindo assim somente um pulo'''
+            if event.key == pygame.K_SPACE and player_rect.bottom >= 300:
+                player_gravity = -20"""
 
+        # juntando os dois últimos ifs para otimização de código
+        if player_rect.bottom >= 300:
+            if event.type == pygame.MOUSEBUTTONDOWN and player_rect.collidepoint(event.pos) \
+                    or event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                player_gravity = -20
 
     '''# aqui estamos acessando a variável da superfície vermelha e escolhendo qual a sua posição
     screen.blit(test_surface, (0, 0))'''
@@ -103,10 +113,15 @@ while True:
         # a posição esquerda do retângulo no eixo X é definida para 800
         snail_rect.left = 800
 
-    '''no início o player tem gravidade 0, após cada interação do loop, a gravidade vai aumentando, e somando da posição
-    do eixo Y, movimentando o player para cima e fazendo com que ele caia exponecialmente'''
+    '''como na vida real, a gravidade nos puxa para baixo, portanto a mecânica utilizada segue este padrão, em todas
+    as interações do loop a gravidade tenta puxar o player para baixo, quando ESPAÇO ou MOUSE são pressionados, ela
+    recebe um valor negativo (-20), fazendo o player pular'''
     player_gravity += 1
     player_rect.y += player_gravity
+    '''o player não cai infinitamente pois criamos um floor utilizando a posição 300 na tela, que é a mesma posição do
+    ground_surface'''
+    if player_rect.bottom >= 300:
+        player_rect.bottom = 300
     screen.blit(player_surf, player_rect)
 
     '''keys = pygame.key.get_pressed()
