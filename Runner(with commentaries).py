@@ -1,5 +1,6 @@
 import pygame
 from sys import exit
+from random import randint
 
 
 # criando uma função para apresentar o score
@@ -13,6 +14,31 @@ def display_score():
     # posicionando na tela o objeto gerado (score_surf) na posição definida (score_rect)
     screen.blit(score_surf, score_rect)
     return current_time
+
+
+def obstacle_movement(obstacle_list):
+    if obstacle_list:
+        for obstacle_rect in obstacle_list:
+            obstacle_rect.x -= 5
+
+            if obstacle_rect.bottom == 300:
+                screen.blit(snail_surf, obstacle_rect)
+            else:
+                screen.blit(fly_surf, obstacle_rect)
+
+        obstacle_list = [obstacle for obstacle in obstacle_list if obstacle.x > -50]
+
+        return obstacle_list
+    else:
+        return []
+
+
+def collisions(player, obstacles):
+    if obstacles:
+        for obstacle_rect in obstacles:
+            if player.colliderect(obstacle_rect):
+                return False
+    return True
 
 
 # comando para iniciar o pygame e todas as suas funções
@@ -49,7 +75,11 @@ score_rect = score_surf.get_rect(center=(400, 50))"""
 snail_surf = pygame.image.load('graphics/snail/snail1.png').convert_alpha()
 '''cria uma variável que recebe o objeto previamente importado junto com as medidas de um retângulo
 os valores entre parênteses definem qual é a posição na tela daquele ponto do retângulo escolhido'''
-snail_rect = snail_surf.get_rect(bottomright=(600, 300))
+# snail_rect = snail_surf.get_rect(bottomright=(600, 300))
+
+fly_surf = pygame.image.load('graphics/Fly/Fly1.png').convert_alpha()
+
+obstacle_rect_list = []
 
 player_surf = pygame.image.load('graphics/Player/player_walk_1.png').convert_alpha()
 """para parametrizar os retângulos, podemos acessar os valores das seguintes formas:
@@ -98,6 +128,9 @@ game_name_rect = game_name.get_rect(center=(400, 80))
 game_message = test_font.render('Pressione espaco para correr', False, (111, 196, 169))
 game_message_rect = game_message.get_rect(center=(400, 330))
 
+obstacle_timer = pygame.USEREVENT + 1
+pygame.time.set_timer(obstacle_timer, 1500)
+
 # o loop é criado para que a tela e os eventos permaneçam acontecendo, senão, tudo iria ser executado somente uma vez
 while True:
     for event in pygame.event.get():
@@ -141,8 +174,16 @@ while True:
         else:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 game_active = True
-                snail_rect.left = 800
+                # snail_rect.left = 800
                 start_time = int(pygame.time.get_ticks() / 100)
+
+        if event.type == obstacle_timer and game_active:
+            if randint(0, 2):
+                obstacle_rect_list.append(snail_surf.get_rect(bottomright=(randint(900, 1100), 300)))
+            else:
+                obstacle_rect_list.append(fly_surf.get_rect(bottomright=(randint(900, 1100), 210)))
+
+
 
     if game_active:
         '''# aqui estamos acessando a variável da superfície vermelha e escolhendo qual a sua posição
@@ -163,14 +204,16 @@ while True:
         # chamando a função para apresentar o score
         score = display_score()
 
-        # posiciona na tela o objeto snail_surf posição snail_rect (que foi o retângulo previamente criado)
+        '''# posiciona na tela o objeto snail_surf posição snail_rect (que foi o retângulo previamente criado)
         screen.blit(snail_surf, snail_rect)
         # acessando o eixo X do retângulo para definir sua motimentação na tela
         snail_rect.x -= 4
         # se a posição da direita do retângulo for menor que 0 no eixo X
         if snail_rect.right < 0:
             # a posição esquerda do retângulo no eixo X é definida para 800
-            snail_rect.left = 800
+            snail_rect.left = 800'''
+
+
 
         '''como na vida real, a gravidade nos puxa para baixo, portanto a mecânica utilizada segue este padrão, em todas
         as interações do loop a gravidade tenta puxar o player para baixo, quando ESPAÇO ou MOUSE são pressionados, ela
@@ -183,11 +226,18 @@ while True:
             player_rect.bottom = 300
         screen.blit(player_surf, player_rect)
 
-        if snail_rect.colliderect(player_rect):
-            game_active = False
+        obstacle_rect_list = obstacle_movement(obstacle_rect_list)
+
+        game_active = collisions(player_rect, obstacle_rect_list)
+
+        '''if snail_rect.colliderect(player_rect):
+            game_active = False'''
     else:
         screen.fill((94, 129, 162))
         screen.blit(player_stand, player_stand_rect)
+        obstacle_rect_list.clear()
+        player_rect.midbottom = (80, 300)
+        player_gravity = 0
 
         score_message = test_font.render(f'Score: {score}', False, (111, 196, 169))
         score_message_rect = score_message.get_rect(center=(400, 330))
