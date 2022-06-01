@@ -15,15 +15,21 @@ def display_score():
     screen.blit(score_surf, score_rect)
     return current_time
 
-
+# criando uma função para apresentar os obstáculos de forma aleatória
 def obstacle_movement(obstacle_list):
+    # IF testa se obstacle_list é True
     if obstacle_list:
+        # criamos uma variável obstacle_rect para o FOR que vai receber o valor de cada item dentro de obstacle_list
         for obstacle_rect in obstacle_list:
+            # o rect se movimenta no eixo X 5pixels por segundo
             obstacle_rect.x -= 5
 
+            # dentro FOR testamos a posição do rect gerado pelo pygame.USEREVENT
             if obstacle_rect.bottom == 300:
+                # se a posição do rect no eixo Y for 300, é gerado na tela um snail
                 screen.blit(snail_surf, obstacle_rect)
             else:
+                # se não, é gerado um fly
                 screen.blit(fly_surf, obstacle_rect)
 
         obstacle_list = [obstacle for obstacle in obstacle_list if obstacle.x > -50]
@@ -39,6 +45,10 @@ def collisions(player, obstacles):
             if player.colliderect(obstacle_rect):
                 return False
     return True
+
+
+# def player_animation():
+
 
 
 # comando para iniciar o pygame e todas as suas funções
@@ -79,9 +89,18 @@ os valores entre parênteses definem qual é a posição na tela daquele ponto d
 
 fly_surf = pygame.image.load('graphics/Fly/Fly1.png').convert_alpha()
 
+# cria uma lista vazia para receber os retângulos dos obstaculos
 obstacle_rect_list = []
 
-player_surf = pygame.image.load('graphics/Player/player_walk_1.png').convert_alpha()
+# importando as duas imagens disponíveis do player para criar a animação
+player_walk_1 = pygame.image.load('graphics/Player/player_walk_1.png').convert_alpha()
+player_walk_2 = pygame.image.load('graphics/Player/player_walk_2.png').convert_alpha()
+# dentro de uma lista colocação as duas imagens importadas
+player_walk = [player_walk_1, player_walk_2]
+# a variável index é que vem controlar qual imagem do player será apresentada
+player_index = 0
+player_jump = pygame.image.load('graphics/Player/jump.png').convert_alpha()
+player_surf = player_walk[player_index]
 """para parametrizar os retângulos, podemos acessar os valores das seguintes formas:
     tuplas(x, y):
         podemos acessar cada valor separado em nove possíveis posições:
@@ -128,7 +147,9 @@ game_name_rect = game_name.get_rect(center=(400, 80))
 game_message = test_font.render('Pressione espaco para correr', False, (111, 196, 169))
 game_message_rect = game_message.get_rect(center=(400, 330))
 
+# utilisamos o método interno .USEREVENT (+1) para adicionar um evento personalizado
 obstacle_timer = pygame.USEREVENT + 1
+# depois criamos uma variável que vai controlar o tempo deste evento, no caso, 1.5 segundos
 pygame.time.set_timer(obstacle_timer, 1500)
 
 # o loop é criado para que a tela e os eventos permaneçam acontecendo, senão, tudo iria ser executado somente uma vez
@@ -177,6 +198,7 @@ while True:
                 # snail_rect.left = 800
                 start_time = int(pygame.time.get_ticks() / 100)
 
+        # utilisamos um IF para testar se existe um evento funcionando AND se o game está ativo
         if event.type == obstacle_timer and game_active:
             if randint(0, 2):
                 obstacle_rect_list.append(snail_surf.get_rect(bottomright=(randint(900, 1100), 300)))
@@ -224,6 +246,7 @@ while True:
         ground_surface'''
         if player_rect.bottom >= 300:
             player_rect.bottom = 300
+        player_animation()
         screen.blit(player_surf, player_rect)
 
         obstacle_rect_list = obstacle_movement(obstacle_rect_list)
